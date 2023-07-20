@@ -1,6 +1,8 @@
 const express = require("express");
 const User = require("../models/user_model");
+const jwt = require("jsonwebtoken")
 const userRoute = express();
+
 
 // <------Middleware to verify access token ( JWT )--------->
 const authenticateToken = (req, res, next) => {
@@ -64,10 +66,13 @@ userRoute.put("/:id", authenticateToken, async (req, res) => {
     if (!existingUser) {
       return res.status(400).json({ message: "user not found", data: null });
     }
-    await User.updateOne({ _id: id, newUserData });
+    let result = await User.updateOne(existingUser,newUserData);
+    if(!result.acknowledged){
+      return res.status(400).json({ message: "user not found", data: null });
+    }
     res
       .status(200)
-      .json({ message: "User updated successfully", data: newUserData });
+      .json({ message: "User updated successfully", data: newUserData});
   } catch (error) {
     res.status(500).json({ message: "server error", error, data: null });
   }
