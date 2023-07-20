@@ -1,9 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const dotenv = require("dotenv")
 const userRoute = require("../routes/userRoutes");
 const employeeRoute = require("../routes/authRoutes");
-
+require('dotenv').config();
 const app = express();
 
 app.use(express.json());
@@ -18,7 +19,7 @@ app.get("/", (req, res) => {
 async function Connect_to_DB() {
   try {
     await mongoose.connect(
-      `mongodb+srv://chetan:12345@cluster0.4jf6kcr.mongodb.net/digisidekick?retryWrites=true&w=majority`
+      `${process.env.MONGODB_LINK}`
     );
     console.log("Connected to mongoDB");
     app.listen(8080, () => {
