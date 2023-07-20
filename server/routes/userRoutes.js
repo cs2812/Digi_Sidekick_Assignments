@@ -24,13 +24,46 @@ const authenticateToken = (req, res, next) => {
 // <----------Get user------------> 
 userRoute.get("/",authenticateToken, async (req, res) => {
   try {
-    const userData = await User.find({});
+    const page = parseInt(req.query.page) || 1; // default 1
+    const usersPerPage = parseInt(req.query.limit) || 10; // default 10
+    const sortBy = req.query.sortBy || '_id'; // default: '_id'
+    const sortOrder = parseInt(req.query.sortOrder) || -1; // default asc
+    const searchQuery = req.query.search || '';
+    const filterBy = req.query.filterBy
+    const filterQuery = req.query.filterQuery
+
+    //sorting
+    const sortOption = {}
+    sortOption[sortBy] = sortOrder
+
+    //searching
+    let findQuery = {};
+    if (searchQuery) {
+      findQuery = { username: { $regex: searchQuery, $options: 'i' } };
+    }
+
+    //filtering
+    if (filterBy) {
+      if(filterBy==="age"){
+        findQuery[filterBy]= +filterQuery;
+      }
+      else{
+        findQuery[filterBy]=filterQuery
+      }
+    }
+    
+    // pagination
+    const dataCount = await User.find(findQuery).count()
+    const totalPages = Math.ceil(dataCount/usersPerPage)
+    const skip = (page-1)*usersPerPage;
+
+    const userData = await User.find(findQuery).sort(sortOption).skip(skip).limit(usersPerPage)
     if (!userData) {
       return res
         .status(400)
         .send({ message: "authorization error", data: null });
     } else {
-      res.status(200).send({ message: "query successfull", data: userData });
+      res.status(200).send({ message: "query successfull", data: userData,totalPages });
     }
   } catch (error) {
     res.status(500).send({ message: "server error", error, data: null });
