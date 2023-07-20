@@ -1,9 +1,26 @@
 const express = require("express");
 const User = require("../models/user_model");
-
 const userRoute = express();
 
-userRoute.get("/", async (req, res) => {
+// <------Middleware to verify access token ( JWT )--------->
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; //start with "Bearer"
+
+  if (!token) {
+    return res.status(401).json({ message: "authorization error" });
+  }
+
+  jwt.verify(token, `ACCESS_KEY_12345`, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: "Login again",error:"Invalid access token" });
+    }
+    next();
+  });
+};
+
+// <----------Get user------------> 
+userRoute.get("/",authenticateToken, async (req, res) => {
   try {
     const userData = await User.find({});
     if (!userData) {
@@ -18,7 +35,8 @@ userRoute.get("/", async (req, res) => {
   }
 });
 
-userRoute.post("/", async (req, res) => {
+// <----------Post user------------> 
+userRoute.post("/", authenticateToken, async (req, res) => {
   try {
     const { email } = req.body;
     const existingUser = await User.findOne({ email });
@@ -37,7 +55,8 @@ userRoute.post("/", async (req, res) => {
   }
 });
 
-userRoute.put("/:id", async (req, res) => {
+// <----------Update user------------> 
+userRoute.put("/:id", authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const newUserData = req.body;
@@ -54,7 +73,8 @@ userRoute.put("/:id", async (req, res) => {
   }
 });
 
-userRoute.delete("/:id", async (req, res) => {
+// <----------Delete user------------> 
+userRoute.delete("/:id",authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const existingUser = await User.findOne({ _id: id });
@@ -67,3 +87,5 @@ userRoute.delete("/:id", async (req, res) => {
     res.status(500).json({ message: "server error", error, data: null });
   }
 });
+
+module.exports = userRoute;
