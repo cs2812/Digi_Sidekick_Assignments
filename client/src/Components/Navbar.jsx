@@ -1,10 +1,12 @@
 import { Button, Flex } from "@chakra-ui/react";
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const isAuth = false;
+  const {isAuth} =useSelector((store)=>store.authReducer)
+  const dispatch = useDispatch()
 
   const handleLogin = () => {
     navigate("/login");
@@ -12,7 +14,9 @@ const Navbar = () => {
   const handleSignUp = () => {
     navigate("/signup");
   };
-  const handleLogout = () => {};
+  const handleLogout = () => {
+    dispatch({type:"USER_LOGOUT_SUCCESS"})
+  };
 
   return (
     <Flex

@@ -7,16 +7,23 @@ import {
   Input,
   Text,
 } from "@chakra-ui/react";
+import axios from "axios";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+  const authBaseURL = "http://localhost:8080/auth";
+  const dispatch = useDispatch();
+  const { loading } = useSelector((store) => store.authReducer);
+  const nevigate = useNavigate();
   const [error, setError] = useState({
-    NoUsername: false,
+    NoEmployee_name: false,
     NoEmail: false,
     NoPassword: false,
   });
   const [form, setForm] = useState({
-    username: "",
+    employee_name: "",
     email: "",
     password: "",
   });
@@ -32,21 +39,33 @@ const Signup = () => {
     return res;
   };
   const handleSignUp = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     setError({
-      NoUsername: form.username === "",
+      NoEmployee_name: form.employee_name === "",
       NoEmail: form.email === "",
       NoPassword: form.password === "",
     });
-    if(form.username && form.email && form.password && isValidPassword(form.password) ){
-      console.log(form, isValidPassword(form.password));
+
+    if (
+      form.employee_name &&
+      form.email &&
+      form.password &&
+      isValidPassword(form.password)
+    ) {
+      dispatch({ type: "LOADING_TRUE", payload: "" });
+      axios
+        .post(`${authBaseURL}/signup`, form)
+        .then((res) => {
+          dispatch({ type: "LOADING_FALSE", payload: "" });
+          alert("Register Successfully");
+          nevigate("/login");
+        })
+        .catch((error) => {
+          dispatch({ type: "LOADING_FALSE", payload: "" });
+          alert("server error. Try after some time");
+          console.log(error);
+        });
     }
-    // dispatch(userlogin(form))
-    // nevigate("/")
-    // setForm({
-    //   email: "",
-    //   password: "",
-    // });
   };
 
   return (
@@ -69,13 +88,15 @@ const Signup = () => {
           boxShadow="base"
         >
           <form action="" onSubmit={handleSignUp}>
-            <FormControl isInvalid={error.NoUsername}>
-              <FormLabel>Username</FormLabel>
+            <FormControl isInvalid={error.NoEmployee_name}>
+              <FormLabel>username</FormLabel>
               <Input
                 type="text"
                 placeholder="Enter username"
-                value={form.username}
-                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                value={form.employee_name}
+                onChange={(e) =>
+                  setForm({ ...form, employee_name: e.target.value })
+                }
               />
               {error.NoEmail ? (
                 <FormErrorMessage>Username is required.</FormErrorMessage>
@@ -109,19 +130,29 @@ const Signup = () => {
               />
               {error.NoPassword ? (
                 <FormErrorMessage textAlign={"left"}>
-                  Invalid password. Password should be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.
+                  Invalid password. Password should be at least 8 characters
+                  long and contain at least one uppercase letter, one lowercase
+                  letter, one digit, and one special character.
                 </FormErrorMessage>
               ) : (
                 ""
               )}
             </FormControl>
             <Box mt="20px" display={"flex"} justifyContent={"right"}>
-              <Button
-                type="submit"
-                colorScheme={"facebook"}
-              >
-                SIGN UP
-              </Button>
+              {loading ? (
+                <Button
+                  isLoading
+                  loadingText="Submitting"
+                  colorScheme="teal"
+                  variant="outline"
+                >
+                  Submit
+                </Button>
+              ) : (
+                <Button type="submit" colorScheme={"facebook"}>
+                  SIGN UP
+                </Button>
+              )}
             </Box>
           </form>
         </Box>
