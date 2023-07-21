@@ -2,7 +2,7 @@
 In this assignment, I have developed a full-stack web application using Node.js and MongoDB. where I am handling CRUD operations on a "users" collection, implementing input validation and error handling for API endpoints. User authentication is secured using JSON Web Tokens (JWT). Additional optional tasks include implementing pagination, sorting, searching, and filtering functionalities for the user listing page. The frontend is displaying a list of users, provides a form to create new users, and allows updating and deleting users with client-side input validation and error handling.
 
 ## Deployed App
-https://deployed-site.whatever
+- Coming Soon
 
 ## Features
 
@@ -13,18 +13,14 @@ https://deployed-site.whatever
 ## Installation & Getting started
 
 ### How to run Backend(server) 
-
 - use your MongoDB_LINK to connect with the database 
 - inside the server directory run the command in terminal 
-
     - npm install 
     - npm start
-
 - without connecting with the database server will not run.
 
 ### How to run Frontend(client) 
 - inside the client directory run the command in terminal 
-
     - npm install 
     - npm start
 
@@ -60,5 +56,8 @@ https://deployed-site.whatever
 ![image](https://github.com/cs2812/Digi_Sidekick_Assignments/assets/101570543/8ab9dbd3-35d8-4e6c-9b48-77303ac16d64)
 ### User Details
 ![image](https://github.com/cs2812/Digi_Sidekick_Assignments/assets/101570543/02a37bb7-cc87-42ae-8c26-f2c20e7562fd)
+### Add/Update user
+![image](https://github.com/cs2812/Digi_Sidekick_Assignments/assets/101570543/06b1164f-bed0-4efd-aa89-c299469cf62a)
+
 
 
