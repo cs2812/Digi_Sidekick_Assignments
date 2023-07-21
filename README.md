@@ -5,7 +5,6 @@ In this assignment, I have developed a full-stack web application using Node.js 
 https://deployed-site.whatever
 
 ## Features
-List out the key features of your application.
 
 - JWT authentication and authorization
 - secured API using JWT token 
@@ -18,38 +17,36 @@ List out the key features of your application.
 - use your MongoDB_LINK to connect with database 
 - inside server directory run command in terminal 
 
-npm install 
-npm start
+    - npm install 
+    - npm start
 
 - without connecting with database server will not run.
 
 ### How to run Frontend(client) 
 - inside client directory run command in terminal 
 
-npm install 
-npm start
+    - npm install 
+    - npm start
 
 ## Usage
-- First of all user has to signup first
-- then login (Now user has JWT token to run query)
-- user will be redirect to user details page.
+- First of all user has to signup 
+- Then login (Now user has JWT token to run query)
+- User will be redirect to user details page.
 - Then Add user.
-- Now user can perform CRUD, Search, Sort, Filter
+- Now user can perform CRUD, Search, Sort, Filter, Pagination
 
 ## API Endpoints
 
-POST /auth/signup -register user
-POST /auth/login -authorize user
+- POST /auth/signup -register user
+- POST /auth/login -authorize user
 
-GET /users - retrieve all items
-POST /users - create a new item
-PUT /users:id - Update item
-DELETE /users:id - Delete item
+- GET /users - retrieve all items
+- POST /users - create a new item
+- PUT /users:id - Update item
+- DELETE /users:id - Delete item
 
 
 ## Technology Stack
-List and provide a brief overview of the technologies used in the project.
-
 - Node.js
 - Express.js
 - MongoDB
