@@ -1,5 +1,6 @@
 const InitialState={
     loading:false,
+    addLoading:false,
     isAuth:localStorage.getItem("key")|| false,
     token:localStorage.getItem("key")||"",
 }
@@ -31,6 +32,18 @@ export const authReducer=(state=InitialState,{type,payload})=>{
             return {
               ...state,
               loading: false,
+            };
+          }
+          case "ADD_LOADING_TRUE": {
+            return {
+              ...state,
+              addLoading: true,
+            };
+          }
+          case "ADD_LOADING_FALSE": {
+            return {
+              ...state,
+              addLoading: false,
             };
           }
         default:{

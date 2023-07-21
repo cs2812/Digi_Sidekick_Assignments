@@ -79,7 +79,6 @@ const Signup = () => {
       <Text fontSize={"2rem"}>Sign Up</Text>
       <Box marginTop={"10px"}>
         <Box
-          // textAlign={"left"}
           w={["90vw", "60vw", "35vw"]}
           borderRadius="10px"
           margin="auto"

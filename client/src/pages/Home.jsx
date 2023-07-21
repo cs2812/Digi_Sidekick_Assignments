@@ -17,23 +17,53 @@ import {
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { USER_GET } from "../Store/users/type";
+import Loading from "../Components/Loading";
+import UserModal from "../Components/UserModal";
+import { userDelete } from "../Store/users/action";
+import { getFilter } from "../helper";
 
 const Home = () => {
   const { usersData } = useSelector((store) => store.userReducer);
+  const { loading, updateLoading, addLoading } = useSelector(
+    (store) => store.authReducer
+  );
+  const [filterData, setFilterData] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [sort, setSort] = useState(1);
+  const [sort, setSort] = useState("");
+  const [sortBy, setSortBy] = useState("");
   const [filterBy, setFilterBy] = useState("");
-  const [filterQuery, setFilter] = useState("");
+  const [filterQuery, setfilterQuery] = useState("");
   const [search, setSearch] = useState("");
   const token = localStorage.getItem("key");
   const dispatch = useDispatch();
-  // console.log(usersData)
+
+  const handleDelete = (id) => {
+    dispatch(userDelete(id));
+  };
+  const handleFilter = (e) => {
+    if (e.target.value === "") {
+      setFilterBy("");
+      setfilterQuery("");
+    } else {
+      setFilterBy("city");
+      setfilterQuery(e.target.value);
+    }
+  };
+  const handleSort = (e) => {
+    if (e.target.value === "") {
+      setSortBy("")
+      setSort("")
+    } else {
+      setSortBy("age")
+      setSort(+e.target.value)
+    }
+  };
 
   function getUser() {
     dispatch({ type: "LOADING_TRUE", payload: "" });
     fetch(
-      `http://localhost:8080/users?page=${page}&limit=5&sortBy=age&sortOrder=${sort}&filterBy=${filterBy}&filterQuery=${filterQuery}&search=${search}`,
+      `http://localhost:8080/users?page=${page}&limit=5&sortBy=${sortBy}&sortOrder=${sort}&filterBy=${filterBy}&filterQuery=${filterQuery}&search=${search}`,
       {
         method: "GET",
         headers: {
@@ -44,7 +74,6 @@ const Home = () => {
     )
       .then((res) => res.json())
       .then((res) => {
-        // console.log(res);
         setTotalPage(res.totalPages);
         dispatch({ type: USER_GET, payload: res });
         dispatch({ type: "LOADING_FALSE", payload: "" });
@@ -57,7 +86,11 @@ const Home = () => {
   }
   useEffect(() => {
     getUser();
-  }, [page, sort]);
+  }, [page, sort, search, filterQuery]);
+
+  useEffect(() => {
+    getFilter(setFilterData);
+  }, []);
   return (
     <Box>
       <Box
@@ -67,16 +100,22 @@ const Home = () => {
         height={"100vh"}
       >
         <Flex p="1rem" justifyContent={"center"} gap="20px">
-          <Box w={"40%"}>
-            <Input placeholder="Search" border={"solid #2db3e5"} />
+          <Box w={"35%"}>
+            <Input
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name"
+              border={"solid #2db3e5"}
+            />
           </Box>
           <Flex gap="10px">
             <Text margin={"auto"}>Sort</Text>
             <Select
-              placeholder="Select option"
+              placeholder="Sort by age"
               size="md"
               border={"solid #2db3e5"}
+              onChange={handleSort}
             >
+              <option value="">ALL</option>
               <option value="1">Age Low to High</option>
               <option value="-1">Age High to Low</option>
             </Select>
@@ -84,64 +123,99 @@ const Home = () => {
           <Flex gap="10px">
             <Text margin={"auto"}>Filter</Text>
             <Select
-              placeholder="Select option"
+              placeholder="Filter by city"
               size="md"
               border={"solid #2db3e5"}
+              onChange={handleFilter}
             >
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+              <option value="">ALL</option>
+              {filterData.map((ele, i) => (
+                <option key={i} value={ele}>
+                  {ele}
+                </option>
+              ))}
             </Select>
           </Flex>
+          {addLoading ? (
+            <Button
+              isLoading
+              loadingText="Submitting"
+              colorScheme="teal"
+              variant="outline"
+            >
+              Submit
+            </Button>
+          ) : (
+            <UserModal type={"add"} />
+          )}
         </Flex>
-        <Box>
-          <TableContainer bg="whiteAlpha.800" shadow={"base"}>
-            <Table variant="simple">
-              <TableCaption>Users Details</TableCaption>
-              <Thead>
-                <Tr textAlign={"center"}>
-                  <Th>Name</Th>
-                  <Th border={"2px solid #f7f7f7"}>Age</Th>
-                  <Th>marital status</Th>
-                  <Th border={"2px solid #f7f7f7"}>City</Th>
-                  <Th>State</Th>
-                  <Th textAlign={"center"} border={"2px solid #f7f7f7"}>
-                    Update
-                  </Th>
-                  <Th textAlign={"center"}>Delete</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {usersData &&
-                  usersData.map((ele) => (
-                    <Tr key={ele._id}>
-                      <Td>{ele.username}</Td>
-                      <Td border={"2px solid #f7f7f7"}>{ele.age}</Td>
-                      <Td border={"2px solid #f7f7f7"}>{`${ele.married}`}</Td>
-                      <Td border={"2px solid #f7f7f7"}>{ele.city}</Td>
-                      <Td border={"2px solid #f7f7f7"}>{ele.state}</Td>
-                      <Td
-                        border={"2px solid #f7f7f7"}
-                        color={"blue"}
-                        cursor={"pointer"}
-                        textAlign={"center"}
-                      >
-                        {"update"}
-                      </Td>
-                      <Td
-                        border={"2px solid #f7f7f7"}
-                        color={"blue"}
-                        cursor={"pointer"}
-                        textAlign={"center"}
-                      >
-                        {/* <SingleReqModal data={ele} /> */}
-                        {"delete"}
-                      </Td>
-                    </Tr>
-                  ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+        <Box
+          overflowX={"hidden"}
+          overflowY={"auto"}
+          boxSizing="border-box"
+          w="90%"
+          h={"75%"}
+          margin={"auto"}
+        >
+          {loading ? (
+            <Loading />
+          ) : (
+            <TableContainer bg="whiteAlpha.800" shadow={"base"}>
+              <Table variant="simple">
+                <TableCaption mt="0%">Users Details</TableCaption>
+                <Thead>
+                  <Tr textAlign={"center"}>
+                    <Th>Name</Th>
+                    <Th border={"2px solid #f7f7f7"}>Age</Th>
+                    <Th>marital status</Th>
+                    <Th border={"2px solid #f7f7f7"}>City</Th>
+                    <Th>State</Th>
+                    <Th textAlign={"center"} border={"2px solid #f7f7f7"}>
+                      Update
+                    </Th>
+                    <Th textAlign={"center"}>Delete</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {usersData &&
+                    usersData.map((ele) => (
+                      <Tr key={ele._id}>
+                        <Td>{ele.username}</Td>
+                        <Td border={"2px solid #f7f7f7"}>{ele.age}</Td>
+                        <Td border={"2px solid #f7f7f7"}>{`${ele.married}`}</Td>
+                        <Td border={"2px solid #f7f7f7"}>{ele.city}</Td>
+                        <Td border={"2px solid #f7f7f7"}>{ele.state}</Td>
+                        <Td
+                          border={"2px solid #f7f7f7"}
+                          color={"blue"}
+                          cursor={"pointer"}
+                          textAlign={"center"}
+                        >
+                          {updateLoading ? (
+                            ""
+                          ) : (
+                            <UserModal type={"update"} data={ele} />
+                          )}
+                        </Td>
+                        <Td
+                          border={"2px solid #f7f7f7"}
+                          color={"blue"}
+                          cursor={"pointer"}
+                          textAlign={"center"}
+                        >
+                          <Button
+                            size="sm"
+                            onClick={() => handleDelete(ele._id)}
+                          >
+                            Delete
+                          </Button>
+                        </Td>
+                      </Tr>
+                    ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          )}
         </Box>
         <Flex mt="10px" justifyContent={"center"} gap="10px">
           <Button
@@ -155,7 +229,7 @@ const Home = () => {
             Page: {page}/{totalPage}
           </Text>
           <Button
-            isDisabled={page === totalPage}
+            isDisabled={page === totalPage || totalPage <= page}
             onClick={() => setPage(page + 1)}
             colorScheme="teal"
           >
