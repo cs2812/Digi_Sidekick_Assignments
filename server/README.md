@@ -1,21 +1,21 @@
 
 ## Schema
 
-- POST /auth/signup -register user
+- POST /auth/signup -register user - 
 {
     employee_name:"",
     email:"",
     password:""
 }
 
-- POST /auth/login -authorize user
+- POST /auth/login -authorize user - 
 {
     email:"",
     password:""
 }
 
-- POST /users - create a new item
-{
+- POST /users - create a new item - 
+  {
     username:"",
     email:"",
     gender:"",
