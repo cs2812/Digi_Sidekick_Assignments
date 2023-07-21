@@ -1,4 +1,4 @@
-import { USER_DELETED, USER_GET, USER_SINGLE, USER_UPDATED } from "./type";
+import { USER_DELETED, USER_GET, USER_POST, USER_SINGLE, USER_UPDATED } from "./type";
 const InitialState = {
   usersData: [],
   user: {},
@@ -6,6 +6,10 @@ const InitialState = {
 
 export const userReducer = (state = InitialState, { type, payload }) => {
   switch (type) {
+    case USER_POST: {
+        state.usersData.unshift(payload.data)
+        return { ...state };
+      }
     case USER_UPDATED: {
       state.usersData = state.usersData.map(
         (ele, i) => ele._id===payload.data._id?payload.data:ele

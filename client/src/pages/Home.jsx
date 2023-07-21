@@ -14,9 +14,50 @@ import {
   Tr,
   Button,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { USER_GET } from "../Store/users/type";
 
 const Home = () => {
+  const { usersData } = useSelector((store) => store.userReducer);
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [sort, setSort] = useState(1);
+  const [filterBy, setFilterBy] = useState("");
+  const [filterQuery, setFilter] = useState("");
+  const [search, setSearch] = useState("");
+  const token = localStorage.getItem("key");
+  const dispatch = useDispatch();
+  // console.log(usersData)
+
+  function getUser() {
+    dispatch({ type: "LOADING_TRUE", payload: "" });
+    fetch(
+      `http://localhost:8080/users?page=${page}&limit=5&sortBy=age&sortOrder=${sort}&filterBy=${filterBy}&filterQuery=${filterQuery}&search=${search}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`, // notice the Bearer before your token
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        // console.log(res);
+        setTotalPage(res.totalPages);
+        dispatch({ type: USER_GET, payload: res });
+        dispatch({ type: "LOADING_FALSE", payload: "" });
+      })
+      .catch((error) => {
+        dispatch({ type: "LOADING_FALSE", payload: "" });
+        alert("internal server issue, Try letter");
+        console.log(error);
+      });
+  }
+  useEffect(() => {
+    getUser();
+  }, [page, sort]);
   return (
     <Box>
       <Box
@@ -71,39 +112,55 @@ const Home = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                <Tr>
-                  <Td>{"name"}</Td>
-                  <Td border={"2px solid #f7f7f7"}>{"24"}</Td>
-                  <Td border={"2px solid #f7f7f7"}>{"false"}</Td>
-                  <Td border={"2px solid #f7f7f7"}>{"jaipur"}</Td>
-                  <Td border={"2px solid #f7f7f7"}>{"Rajasthan"}</Td>
-                  <Td
-                    border={"2px solid #f7f7f7"}
-                    color={"blue"}
-                    cursor={"pointer"}
-                    textAlign={"center"}
-                  >
-                    {/* <SingleReqModal data={ele} /> */}
-                    {"update"}
-                  </Td>
-                  <Td
-                    border={"2px solid #f7f7f7"}
-                    color={"blue"}
-                    cursor={"pointer"}
-                    textAlign={"center"}
-                  >
-                    {/* <SingleReqModal data={ele} /> */}
-                    {"delete"}
-                  </Td>
-                </Tr>
+                {usersData &&
+                  usersData.map((ele) => (
+                    <Tr key={ele._id}>
+                      <Td>{ele.username}</Td>
+                      <Td border={"2px solid #f7f7f7"}>{ele.age}</Td>
+                      <Td border={"2px solid #f7f7f7"}>{`${ele.married}`}</Td>
+                      <Td border={"2px solid #f7f7f7"}>{ele.city}</Td>
+                      <Td border={"2px solid #f7f7f7"}>{ele.state}</Td>
+                      <Td
+                        border={"2px solid #f7f7f7"}
+                        color={"blue"}
+                        cursor={"pointer"}
+                        textAlign={"center"}
+                      >
+                        {"update"}
+                      </Td>
+                      <Td
+                        border={"2px solid #f7f7f7"}
+                        color={"blue"}
+                        cursor={"pointer"}
+                        textAlign={"center"}
+                      >
+                        {/* <SingleReqModal data={ele} /> */}
+                        {"delete"}
+                      </Td>
+                    </Tr>
+                  ))}
               </Tbody>
             </Table>
           </TableContainer>
         </Box>
         <Flex mt="10px" justifyContent={"center"} gap="10px">
-          <Button colorScheme="teal">Previous</Button>
-          <Text mt="6px">Page: {1}</Text>
-          <Button colorScheme="teal">Next</Button>
+          <Button
+            isDisabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            colorScheme="teal"
+          >
+            Previous
+          </Button>
+          <Text mt="6px">
+            Page: {page}/{totalPage}
+          </Text>
+          <Button
+            isDisabled={page === totalPage}
+            onClick={() => setPage(page + 1)}
+            colorScheme="teal"
+          >
+            Next
+          </Button>
         </Flex>
       </Box>
     </Box>
