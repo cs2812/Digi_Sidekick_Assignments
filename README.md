@@ -5,6 +5,9 @@ In this assignment, I have developed a full-stack web application using Node.js 
 ## Deployed App
 - Coming Soon
 
+## Video of project presentation
+- Link = https://www.youtube.com/watch?v=PnT7tlc5L58
+
 ## Features
 
 - JWT authentication and authorization
